@@ -21,6 +21,7 @@ import Dropdown from "../../components/elements/Dropdown";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import useWindowSize from "../../hooks/useWindowSize";
 import { useRef } from "react";
+import ModalFilter from "./ModalFilter";
 
 function Page() {
   Fancybox.bind();
@@ -40,6 +41,7 @@ function Page() {
   const [winner, setWinner] = useState({});
 	const [isLoading, setIsLoading] = useState(true);
   const [openModal, setOpenModal] = useState(false);
+  const [openModalFilter, setOpenModalFilter] = useState(false);
   const [selectedWinners, setSelectedWinners] = useState([]);
   const statusWinnersRef = useRef(statusWinners[0].value);
   const noteWinnersRef = useRef('');
@@ -67,6 +69,10 @@ function Page() {
     params.per_page,
     params.q,
     params["claimed_at:not_null"],
+    params["status:in"],
+    params["doorprize_id:in"],
+    params["claimed_at:>="],
+    params["claimed_at:<="],
   ]);
 
 	async function getWinners(loading = false) {
@@ -226,6 +232,9 @@ function Page() {
               </div>
             }
           >
+            <Dropdown.Item onClick={() => setOpenModalFilter(true)}>
+              <FontAwesomeIcon className="me-1" icon={faEdit} /> Filters
+            </Dropdown.Item>
             {can("export winners") && (
               <Dropdown.Item onClick={exportToExcel}>
                 <FontAwesomeIcon className="me-1" icon={faFileExcel} /> Export to Excel
@@ -327,6 +336,12 @@ function Page() {
         winner={winner}
         setWinner={setWinner}
         loadData={getWinners}
+      />
+      <ModalFilter
+        openModal={openModalFilter}
+        setOpenModal={setOpenModalFilter}
+        params={params}
+        setParams={setParams}
       />
     </PrivateLayout>
   );
