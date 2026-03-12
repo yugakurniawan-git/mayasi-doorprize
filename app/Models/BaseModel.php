@@ -156,7 +156,7 @@ trait BaseModel
     $this->recursiveRelationSearch($query, $relations, $fields, $search);
   }
 
-  private function recursiveRelationSearch($query, $relations, $fields, $search)
+  public function recursiveRelationSearch($query, $relations, $fields, $search)
   {
     $relationName = array_shift($relations);
 
