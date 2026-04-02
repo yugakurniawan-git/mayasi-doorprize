@@ -16,9 +16,8 @@ sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq \
 sudo service mariadb start
 sudo service redis-server start
 
-# Set MySQL root password & create database
-sudo mysql -u root <<SQL
-  ALTER USER 'root'@'localhost' IDENTIFIED BY 'root';
+# Create database (MariaDB uses unix_socket auth, no password needed with sudo)
+sudo mysql <<SQL
   CREATE DATABASE IF NOT EXISTS doorprize;
   FLUSH PRIVILEGES;
 SQL
@@ -38,7 +37,7 @@ fi
 sed -i 's/^DB_HOST=.*/DB_HOST=127.0.0.1/' .env
 sed -i 's/^DB_PORT=.*/DB_PORT=3306/' .env
 sed -i 's/^DB_USERNAME=.*/DB_USERNAME=root/' .env
-sed -i 's/^DB_PASSWORD=.*/DB_PASSWORD=root/' .env
+sed -i 's/^DB_PASSWORD=.*/DB_PASSWORD=/' .env
 sed -i 's/^DB_DATABASE=.*/DB_DATABASE=doorprize/' .env
 sed -i 's/^REDIS_HOST=.*/REDIS_HOST=127.0.0.1/' .env
 sed -i 's/^REDIS_PORT=.*/REDIS_PORT=6379/' .env
