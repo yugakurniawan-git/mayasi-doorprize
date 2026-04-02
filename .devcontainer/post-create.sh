@@ -7,18 +7,18 @@ echo "🚀 Starting Doorprize Development Setup..."
 echo "📦 Installing MySQL & Redis..."
 sudo apt-get update -qq
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq \
-  mysql-server \
+  mariadb-server \
   redis-server \
   libzip-dev \
   zip
 
 # Start services
-sudo service mysql start
+sudo service mariadb start
 sudo service redis-server start
 
 # Set MySQL root password & create database
 sudo mysql -u root <<SQL
-  ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';
+  ALTER USER 'root'@'localhost' IDENTIFIED BY 'root';
   CREATE DATABASE IF NOT EXISTS doorprize;
   FLUSH PRIVILEGES;
 SQL
