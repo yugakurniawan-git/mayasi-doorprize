@@ -6,26 +6,16 @@
     "ghcr.io/devcontainers/features/node:1": {
       "version": "22"
     },
-    "ghcr.io/devcontainers/features/mysql:1": {
-      "version": "8.0"
-    },
-    "ghcr.io/devcontainers/features/redis:1": {
-      "version": "7"
-    },
     "ghcr.io/devcontainers/features/git:1": {}
   },
 
   "customizations": {
     "vscode": {
       "extensions": [
-        "ms-vscode.vscode-typescript-next",
         "xdebug.php-debug",
-        "felixbecker.php-intellisense",
-        "onecentlin.laravel-extension-pack",
         "onecentlin.laravel-blade",
         "esbenp.prettier-vscode",
         "bradlc.vscode-tailwindcss",
-        "Vue.volar",
         "Catppuccin.catppuccin-vsc"
       ],
       "settings": {
@@ -34,10 +24,6 @@
           "editor.formatOnSave": true
         },
         "[javascript]": {
-          "editor.defaultFormatter": "esbenp.prettier-vscode",
-          "editor.formatOnSave": true
-        },
-        "[json]": {
           "editor.defaultFormatter": "esbenp.prettier-vscode",
           "editor.formatOnSave": true
         },
@@ -74,8 +60,5 @@
     }
   },
 
-  "remoteUser": "root",
-  "mounts": [
-    "source=${localEnv:HOME}/.ssh,target=/root/.ssh,readonly"
-  ]
+  "remoteUser": "vscode"
 }

@@ -3,84 +3,87 @@ set -e
 
 echo "🚀 Starting Doorprize Development Setup..."
 
-# Change to app directory
-cd /workspaces/doorprize
+# ── 1. Install MySQL & Redis via apt ─────────────────────────────────────────
+echo "📦 Installing MySQL & Redis..."
+sudo apt-get update -qq
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq \
+  mysql-server \
+  redis-server \
+  libzip-dev \
+  zip
 
-# Copy .env file if it doesn't exist
+# Start services
+sudo service mysql start
+sudo service redis-server start
+
+# Set MySQL root password & create database
+sudo mysql -u root <<SQL
+  ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';
+  CREATE DATABASE IF NOT EXISTS doorprize;
+  FLUSH PRIVILEGES;
+SQL
+
+echo "✅ MySQL & Redis running"
+
+# ── 2. Setup project ──────────────────────────────────────────────────────────
+cd /workspaces/mayasi-doorprize
+
+# Copy .env file
 if [ ! -f .env ]; then
   echo "📋 Creating .env file..."
   cp .env.example .env
 fi
 
-# Install PHP dependencies
-echo "📦 Installing PHP dependencies..."
-composer install
+# Update .env untuk local Codespaces development
+sed -i 's/^DB_HOST=.*/DB_HOST=127.0.0.1/' .env
+sed -i 's/^DB_PORT=.*/DB_PORT=3306/' .env
+sed -i 's/^DB_USERNAME=.*/DB_USERNAME=root/' .env
+sed -i 's/^DB_PASSWORD=.*/DB_PASSWORD=root/' .env
+sed -i 's/^DB_DATABASE=.*/DB_DATABASE=doorprize/' .env
+sed -i 's/^REDIS_HOST=.*/REDIS_HOST=127.0.0.1/' .env
+sed -i 's/^REDIS_PORT=.*/REDIS_PORT=6379/' .env
+sed -i 's/^APP_URL=.*/APP_URL="http:\/\/localhost:8000"/' .env
+sed -i 's/^VITE_BASE_URL=.*/VITE_BASE_URL="http:\/\/localhost:8000"/' .env
+sed -i 's/^SESSION_DRIVER=.*/SESSION_DRIVER=file/' .env
+sed -i 's/^CACHE_STORE=.*/CACHE_STORE=file/' .env
+sed -i 's/^FILESYSTEM_DISK=.*/FILESYSTEM_DISK=public/' .env
 
-# Install Node dependencies
+# ── 3. Install dependencies ───────────────────────────────────────────────────
+echo "📦 Installing PHP dependencies..."
+composer install --no-interaction
+
 echo "📦 Installing Node dependencies..."
 npm install
 
-# Generate APP_KEY if not set
-if grep -q "^APP_KEY=$" .env; then
-  echo "🔐 Generating APP_KEY..."
-  php artisan key:generate
-fi
+# ── 4. Generate keys ──────────────────────────────────────────────────────────
+echo "🔐 Generating keys..."
+php artisan key:generate --force
+php artisan jwt:secret --force
 
-# Generate JWT_SECRET if not set
-if grep -q "^JWT_SECRET=$" .env; then
-  echo "🔐 Generating JWT_SECRET..."
-  php artisan jwt:secret --force
-fi
+# ── 5. Storage & cache ────────────────────────────────────────────────────────
+echo "📁 Setting up storage..."
+mkdir -p storage/logs storage/app/public bootstrap/cache
+chmod -R 775 storage bootstrap/cache
+php artisan storage:link || true
 
-# Create storage directories
-echo "📁 Creating storage directories..."
-mkdir -p storage/logs
-mkdir -p storage/app/public
-mkdir -p bootstrap/cache
-
-# Set permissions
-echo "🔒 Setting permissions..."
-chmod -R 775 storage
-chmod -R 775 bootstrap/cache
-
-# Create database and run migrations
-echo "🗄️  Setting up database..."
-# Wait for MySQL to be ready
-for i in {1..30}; do
-  if php artisan tinker --execute="DB::connection()->getPdo()" 2>/dev/null; then
-    echo "✅ Database connected!"
-    break
-  fi
-  echo "⏳ Waiting for database... ($i/30)"
-  sleep 1
-done
-
-# Run migrations and seed
-php artisan migrate --seed --force || true
-
-# Set up frontend environment variables
-echo "🎨 Setting up frontend environment..."
-if ! grep -q "^VITE_API_KEY=" .env; then
-  echo "VITE_API_KEY=local-dev-key" >> .env
-fi
-
-if ! grep -q "^VITE_BASE_URL=" .env; then
-  echo "VITE_BASE_URL=http://localhost:8000" >> .env
-fi
+# ── 6. Database migration ─────────────────────────────────────────────────────
+echo "🗄️  Running migrations & seeding..."
+php artisan migrate --seed --force
 
 echo ""
-echo "✅ Setup complete!"
+echo "✅ ─── Setup complete! ────────────────────────────────"
 echo ""
-echo "📝 Next steps:"
-echo "1. Open Terminal (Ctrl+\`)"
-echo "2. Run: php artisan octane:start --server=frankenphp --host=0.0.0.0 --port=8000"
-echo "3. In another terminal, run: npm run dev"
+echo "  Jalankan di terminal:"
 echo ""
-echo "🌐 Then access:"
-echo "   - Frontend: http://localhost:8000"
-echo "   - Vite dev: http://localhost:7401"
+echo "  Terminal 1 (Backend):"
+echo "  php artisan serve --host=0.0.0.0 --port=8000"
 echo ""
-echo "👤 Default credentials:"
-echo "   - User: admin"
-echo "   - Password: password"
+echo "  Terminal 2 (Frontend):"
+echo "  npm run dev"
 echo ""
+echo "  Akses: http://localhost:8000"
+echo ""
+echo "  Login:"
+echo "  Email   : admin@manohara-asri.com"
+echo "  Password: password"
+echo "──────────────────────────────────────────────────────"
