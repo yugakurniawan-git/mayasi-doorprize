@@ -18,10 +18,7 @@ export default defineConfig(({command, mode}) => {
     server: {
       host: true, // atau "0.0.0.0"
       port: parseInt(env.VITE_PORT) || 7401,
-      hmr: {
-        host: 'localhost', // biar cocok sama domain Laravel
-        protocol: 'ws',
-      },
+      cors: true,
       watch: {
         usePolling: true, // penting untuk hot reload di Docker
       },
