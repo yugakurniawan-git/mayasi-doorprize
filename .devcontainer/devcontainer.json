@@ -1,8 +1,8 @@
 {
   "name": "Doorprize Development",
   "build": {
-    "context": "..",
-    "dockerfile": "../docker/images/frankenphp82/Dockerfile"
+    "context": ".",
+    "dockerfile": "Dockerfile"
   },
 
   "customizations": {
@@ -26,7 +26,7 @@
 
   "postCreateCommand": "bash .devcontainer/post-create.sh",
 
-  "forwardPorts": [8000, 7401, 3306, 6379],
+  "forwardPorts": [8000, 7401],
   "portAttributes": {
     "8000": {
       "label": "Laravel App",
@@ -35,14 +35,6 @@
     "7401": {
       "label": "Vite Dev Server",
       "onAutoForward": "notify"
-    },
-    "3306": {
-      "label": "MySQL",
-      "onAutoForward": "silent"
-    },
-    "6379": {
-      "label": "Redis",
-      "onAutoForward": "silent"
     }
   },
 
