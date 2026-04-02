@@ -1,5 +1,8 @@
 FROM mcr.microsoft.com/devcontainers/php:8.3-bullseye
 
+# Remove yarn repository which has an expired GPG key preventing apt-get update
+RUN rm -f /etc/apt/sources.list.d/yarn.list
+
 # Install system dependencies + MariaDB + Redis
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get install -y --no-install-recommends \
