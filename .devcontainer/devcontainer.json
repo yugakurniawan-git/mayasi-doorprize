@@ -1,0 +1,81 @@
+{
+  "name": "Doorprize Development",
+  "image": "mcr.microsoft.com/devcontainers/php:8.2-bullseye",
+
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "22"
+    },
+    "ghcr.io/devcontainers/features/mysql:1": {
+      "version": "8.0"
+    },
+    "ghcr.io/devcontainers/features/redis:1": {
+      "version": "7"
+    },
+    "ghcr.io/devcontainers/features/git:1": {}
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.vscode-typescript-next",
+        "xdebug.php-debug",
+        "felixbecker.php-intellisense",
+        "onecentlin.laravel-extension-pack",
+        "onecentlin.laravel-blade",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
+        "Vue.volar",
+        "Catppuccin.catppuccin-vsc"
+      ],
+      "settings": {
+        "[php]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode",
+          "editor.formatOnSave": true
+        },
+        "[javascript]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode",
+          "editor.formatOnSave": true
+        },
+        "[json]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode",
+          "editor.formatOnSave": true
+        },
+        "php.validate.executablePath": "/usr/local/bin/php",
+        "php.validate.enable": true,
+        "php.validate.run": "onSave"
+      }
+    }
+  },
+
+  "containerEnv": {
+    "COMPOSER_ALLOW_SUPERUSER": "1"
+  },
+
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+
+  "forwardPorts": [8000, 7401, 3306, 6379],
+  "portAttributes": {
+    "8000": {
+      "label": "Laravel App",
+      "onAutoForward": "notify"
+    },
+    "7401": {
+      "label": "Vite Dev Server",
+      "onAutoForward": "notify"
+    },
+    "3306": {
+      "label": "MySQL",
+      "onAutoForward": "silent"
+    },
+    "6379": {
+      "label": "Redis",
+      "onAutoForward": "silent"
+    }
+  },
+
+  "remoteUser": "root",
+  "mounts": [
+    "source=${localEnv:HOME}/.ssh,target=/root/.ssh,readonly"
+  ]
+}
