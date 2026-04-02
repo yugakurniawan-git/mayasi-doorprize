@@ -34,6 +34,7 @@ sed -i 's/^VITE_BASE_URL=.*/VITE_BASE_URL=http:\/\/localhost:8000/' .env
 sed -i 's/^SESSION_DRIVER=.*/SESSION_DRIVER=file/' .env
 sed -i 's/^CACHE_STORE=.*/CACHE_STORE=file/' .env
 sed -i 's/^FILESYSTEM_DISK=.*/FILESYSTEM_DISK=public/' .env
+sed -i "s/^VITE_API_KEY=.*/VITE_API_KEY=devkey123456/" .env
 
 # ── 3. Install dependencies ───────────────────────────────────────────────────
 echo "📦 Installing PHP dependencies..."
