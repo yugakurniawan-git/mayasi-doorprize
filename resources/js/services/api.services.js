@@ -3,7 +3,7 @@ import { Toast } from "../helpers";
 import Swal from "sweetalert2";
 
 let headers = {
-  key: import.meta.env.VITE_API_KEY,
+  key: import.meta.env.VITE_API_KEY || "devkey123456",
   Accept: "application/json",
 };
 
