@@ -10,7 +10,12 @@ sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq \
   mariadb-server \
   redis-server \
   libzip-dev \
+  libpng-dev \
   zip
+
+# Install PHP extensions
+echo "📦 Installing PHP extensions..."
+sudo docker-php-ext-install pdo_mysql zip gd
 
 # Start services
 sudo service mariadb start
