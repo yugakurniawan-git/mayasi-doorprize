@@ -1,12 +1,8 @@
 {
   "name": "Doorprize Development",
-  "image": "mcr.microsoft.com/devcontainers/php:8.2-bullseye",
-
-  "features": {
-    "ghcr.io/devcontainers/features/node:1": {
-      "version": "22"
-    },
-    "ghcr.io/devcontainers/features/git:1": {}
+  "build": {
+    "context": "..",
+    "dockerfile": "../docker/images/frankenphp82/Dockerfile"
   },
 
   "customizations": {
@@ -15,21 +11,11 @@
         "xdebug.php-debug",
         "onecentlin.laravel-blade",
         "esbenp.prettier-vscode",
-        "bradlc.vscode-tailwindcss",
-        "Catppuccin.catppuccin-vsc"
+        "bradlc.vscode-tailwindcss"
       ],
       "settings": {
-        "[php]": {
-          "editor.defaultFormatter": "esbenp.prettier-vscode",
-          "editor.formatOnSave": true
-        },
-        "[javascript]": {
-          "editor.defaultFormatter": "esbenp.prettier-vscode",
-          "editor.formatOnSave": true
-        },
         "php.validate.executablePath": "/usr/local/bin/php",
-        "php.validate.enable": true,
-        "php.validate.run": "onSave"
+        "php.validate.enable": true
       }
     }
   },
@@ -60,5 +46,5 @@
     }
   },
 
-  "remoteUser": "vscode"
+  "remoteUser": "root"
 }

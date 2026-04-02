@@ -3,42 +3,36 @@ set -e
 
 echo "🚀 Starting Doorprize Development Setup..."
 
-# ── 1. Install MySQL & Redis via apt ─────────────────────────────────────────
-echo "📦 Installing MySQL & Redis..."
-sudo apt-get update -qq
-sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq \
-  mariadb-server \
-  redis-server \
-  libzip-dev \
-  libpng-dev \
-  zip
-
-# Install PHP extensions
-echo "📦 Installing PHP extensions..."
-sudo docker-php-ext-install pdo_mysql zip gd
-
-# Start services
-sudo service mariadb start
-sudo service redis-server start
-
-# Create database (MariaDB uses unix_socket auth, no password needed with sudo)
-sudo mysql <<SQL
-  CREATE DATABASE IF NOT EXISTS doorprize;
-  FLUSH PRIVILEGES;
-SQL
-
-echo "✅ MySQL & Redis running"
-
-# ── 2. Setup project ──────────────────────────────────────────────────────────
 cd /workspaces/mayasi-doorprize
 
-# Copy .env file
+# ── 1. Install Node.js ────────────────────────────────────────────────────────
+echo "📦 Installing Node.js..."
+curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+apt-get install -y nodejs
+
+# ── 2. Install & start MariaDB ────────────────────────────────────────────────
+echo "📦 Installing MariaDB..."
+apt-get install -y mariadb-server
+service mariadb start
+sleep 2
+
+# Create database
+mysql <<SQL
+CREATE DATABASE IF NOT EXISTS doorprize;
+SQL
+echo "✅ Database created"
+
+# ── 3. Install Redis ──────────────────────────────────────────────────────────
+echo "📦 Installing Redis..."
+apt-get install -y redis-server
+service redis-server start
+echo "✅ Redis started"
+
+# ── 4. Setup .env ─────────────────────────────────────────────────────────────
 if [ ! -f .env ]; then
-  echo "📋 Creating .env file..."
   cp .env.example .env
 fi
 
-# Update .env untuk local Codespaces development
 sed -i 's/^DB_HOST=.*/DB_HOST=127.0.0.1/' .env
 sed -i 's/^DB_PORT=.*/DB_PORT=3306/' .env
 sed -i 's/^DB_USERNAME=.*/DB_USERNAME=root/' .env
@@ -46,46 +40,38 @@ sed -i 's/^DB_PASSWORD=.*/DB_PASSWORD=/' .env
 sed -i 's/^DB_DATABASE=.*/DB_DATABASE=doorprize/' .env
 sed -i 's/^REDIS_HOST=.*/REDIS_HOST=127.0.0.1/' .env
 sed -i 's/^REDIS_PORT=.*/REDIS_PORT=6379/' .env
-sed -i 's/^APP_URL=.*/APP_URL="http:\/\/localhost:8000"/' .env
-sed -i 's/^VITE_BASE_URL=.*/VITE_BASE_URL="http:\/\/localhost:8000"/' .env
+sed -i 's/^APP_URL=.*/APP_URL=http:\/\/localhost:8000/' .env
+sed -i 's/^VITE_BASE_URL=.*/VITE_BASE_URL=http:\/\/localhost:8000/' .env
 sed -i 's/^SESSION_DRIVER=.*/SESSION_DRIVER=file/' .env
 sed -i 's/^CACHE_STORE=.*/CACHE_STORE=file/' .env
 sed -i 's/^FILESYSTEM_DISK=.*/FILESYSTEM_DISK=public/' .env
 
-# ── 3. Install dependencies ───────────────────────────────────────────────────
+# ── 5. Install PHP & Node dependencies ───────────────────────────────────────
 echo "📦 Installing PHP dependencies..."
 composer install --no-interaction
 
 echo "📦 Installing Node dependencies..."
 npm install
 
-# ── 4. Generate keys ──────────────────────────────────────────────────────────
+# ── 6. Generate keys ──────────────────────────────────────────────────────────
 echo "🔐 Generating keys..."
 php artisan key:generate --force
 php artisan jwt:secret --force
 
-# ── 5. Storage & cache ────────────────────────────────────────────────────────
-echo "📁 Setting up storage..."
+# ── 7. Storage setup ──────────────────────────────────────────────────────────
 mkdir -p storage/logs storage/app/public bootstrap/cache
 chmod -R 775 storage bootstrap/cache
 php artisan storage:link || true
 
-# ── 6. Database migration ─────────────────────────────────────────────────────
+# ── 8. Migrate & seed ─────────────────────────────────────────────────────────
 echo "🗄️  Running migrations & seeding..."
 php artisan migrate --seed --force
 
 echo ""
 echo "✅ ─── Setup complete! ────────────────────────────────"
 echo ""
-echo "  Jalankan di terminal:"
-echo ""
-echo "  Terminal 1 (Backend):"
-echo "  php artisan serve --host=0.0.0.0 --port=8000"
-echo ""
-echo "  Terminal 2 (Frontend):"
-echo "  npm run dev"
-echo ""
-echo "  Akses: http://localhost:8000"
+echo "  Terminal 1: php artisan serve --host=0.0.0.0 --port=8000"
+echo "  Terminal 2: npm run dev"
 echo ""
 echo "  Login:"
 echo "  Email   : admin@manohara-asri.com"
