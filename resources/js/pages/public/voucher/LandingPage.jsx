@@ -3,64 +3,30 @@ import { useParams, useNavigate } from "react-router";
 import { apiService } from "../../../services/api.services";
 import Swal from "sweetalert2";
 
-/* ─── Decorative SVG Lantern ────────────────────────────────── */
-const Lantern = ({ height = 90 }) => (
-  <svg width={height * 0.4} height={height} viewBox="0 0 36 90" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <line x1="18" y1="0" x2="18" y2="9" stroke="#92400e" strokeWidth="2"/>
-    <ellipse cx="18" cy="12" rx="8" ry="3" fill="#78350f"/>
-    <path d="M10 12 Q4 32 7 56 Q11 68 18 70 Q25 68 29 56 Q32 32 26 12 Z" fill="#d97706"/>
-    <path d="M13 17 Q7 36 10 54 Q14 65 18 67 Q22 65 26 54 Q29 36 23 17 Z" fill="#fbbf24" opacity="0.75"/>
-    <line x1="16" y1="22" x2="20" y2="22" stroke="#92400e" strokeWidth="0.8" opacity="0.5"/>
-    <line x1="14" y1="35" x2="22" y2="35" stroke="#92400e" strokeWidth="0.8" opacity="0.5"/>
-    <line x1="13" y1="48" x2="23" y2="48" stroke="#92400e" strokeWidth="0.8" opacity="0.5"/>
-    <ellipse cx="18" cy="70" rx="6.5" ry="2.5" fill="#78350f"/>
-    <line x1="18" y1="72.5" x2="18" y2="79" stroke="#92400e" strokeWidth="1.5"/>
-    <line x1="16" y1="76" x2="14" y2="87" stroke="#92400e" strokeWidth="1"/>
-    <line x1="18" y1="77" x2="18" y2="89" stroke="#92400e" strokeWidth="1"/>
-    <line x1="20" y1="76" x2="22" y2="87" stroke="#92400e" strokeWidth="1"/>
-  </svg>
-);
+/* ─── Floating geometric decorations (left panel) ───────────── */
+const FLOAT_SHAPES = [
+  { w: 64,  h: 64,  top: 5,  left: 88, color: 'rgba(139,92,246,0.08)',  shape: 'circle'  },
+  { w: 40,  h: 40,  top: 20, left: 92, color: 'rgba(168,85,247,0.06)',  shape: 'circle'  },
+  { w: 80,  h: 80,  top: 78, left: 2,  color: 'rgba(99,102,241,0.07)',  shape: 'circle'  },
+  { w: 50,  h: 50,  top: 90, left: 85, color: 'rgba(139,92,246,0.05)',  shape: 'square'  },
+  { w: 30,  h: 30,  top: 45, left: 95, color: 'rgba(217,70,239,0.06)',  shape: 'circle'  },
+  { w: 55,  h: 55,  top: 60, left: 0,  color: 'rgba(99,102,241,0.05)',  shape: 'circle'  },
+];
 
-/* ─── Decorative corner mandala (top-right of left panel) ───── */
-const CornerOrnament = () => (
-  <svg className="absolute top-0 right-0 opacity-[0.07] pointer-events-none" width="200" height="200" viewBox="0 0 200 200">
-    {[20, 40, 60, 80, 110, 145].map((r, i) => (
-      <circle key={i} cx="200" cy="0" r={r} stroke="#78350f" strokeWidth="1.2" fill="none"/>
-    ))}
-    <path d="M200 0 L120 80" stroke="#78350f" strokeWidth="0.8"/>
-    <path d="M200 0 L100 60" stroke="#78350f" strokeWidth="0.8"/>
-    <path d="M200 0 L150 100" stroke="#78350f" strokeWidth="0.8"/>
-    <path d="M200 0 L80 80" stroke="#78350f" strokeWidth="0.8"/>
-    <path d="M200 0 L60 120" stroke="#78350f" strokeWidth="0.8"/>
-  </svg>
-);
-
-const CornerOrnamentBottomLeft = () => (
-  <svg className="absolute bottom-0 left-0 opacity-[0.07] pointer-events-none" width="160" height="160" viewBox="0 0 160 160">
-    {[20, 40, 60, 90, 120].map((r, i) => (
-      <circle key={i} cx="0" cy="160" r={r} stroke="#78350f" strokeWidth="1.2" fill="none"/>
-    ))}
-  </svg>
-);
-
-/* ─── Pre-defined confetti for right panel (no Math.random in render) ─ */
-const CONFETTI = [
-  { w: 80,  h: 80,  top: 4,  left: 8,  color: 'rgba(251,191,36,0.18)' },
-  { w: 50,  h: 50,  top: 15, left: 78, color: 'rgba(255,255,255,0.12)' },
-  { w: 120, h: 120, top: 45, left: 82, color: 'rgba(134,239,172,0.10)' },
-  { w: 40,  h: 40,  top: 72, left: 18, color: 'rgba(251,191,36,0.15)' },
-  { w: 70,  h: 70,  top: 88, left: 58, color: 'rgba(255,255,255,0.09)' },
-  { w: 90,  h: 90,  top: 28, left: 42, color: 'rgba(251,191,36,0.08)' },
-  { w: 35,  h: 35,  top: 58, left: 4,  color: 'rgba(255,255,255,0.14)' },
-  { w: 55,  h: 55,  top: 92, left: 88, color: 'rgba(134,239,172,0.12)' },
-  { w: 65,  h: 65,  top: 6,  left: 55, color: 'rgba(255,255,255,0.07)' },
-  { w: 45,  h: 45,  top: 38, left: 2,  color: 'rgba(251,191,36,0.10)' },
+/* ─── Right panel decorative orbs ───────────────────────────── */
+const RIGHT_ORBS = [
+  { w: 180, h: 180, top: -5,  left: -8,  color: 'rgba(255,255,255,0.04)' },
+  { w: 120, h: 120, top: 60,  left: 70,  color: 'rgba(255,255,255,0.05)' },
+  { w: 80,  h: 80,  top: 30,  left: 85,  color: 'rgba(255,255,255,0.06)' },
+  { w: 100, h: 100, top: 80,  left: 5,   color: 'rgba(255,255,255,0.04)' },
+  { w: 60,  h: 60,  top: 15,  left: 55,  color: 'rgba(251,191,36,0.08)'  },
+  { w: 45,  h: 45,  top: 50,  left: 20,  color: 'rgba(251,191,36,0.06)'  },
 ];
 
 const PRIZE_ICONS = ["🏆", "💰", "🥇", "🥈", "🎖️", "🎁", "💵", "✨"];
 const PRIZE_COLORS = [
   "from-amber-400 to-yellow-500",
-  "from-green-400 to-emerald-500",
+  "from-emerald-400 to-green-500",
   "from-sky-400 to-blue-500",
   "from-pink-400 to-rose-500",
   "from-violet-400 to-purple-500",
@@ -69,7 +35,7 @@ const PRIZE_COLORS = [
 const formatDateID = (dateStr) => {
   if (!dateStr) return null;
   return new Date(dateStr).toLocaleDateString("id-ID", {
-    day: "numeric", month: "long", year: "numeric"
+    day: "numeric", month: "long", year: "numeric",
   });
 };
 
@@ -80,7 +46,7 @@ function CheckBox({ checked, onChange, children }) {
       <div
         onClick={onChange}
         className={`mt-0.5 w-5 h-5 rounded flex-shrink-0 border-2 flex items-center justify-center cursor-pointer transition-all
-          ${checked ? 'bg-green-600 border-green-600' : 'bg-white border-gray-400 group-hover:border-green-400'}`}
+          ${checked ? 'bg-green-500 border-green-500' : 'bg-white border-purple-300 group-hover:border-violet-400'}`}
       >
         {checked && (
           <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -88,7 +54,7 @@ function CheckBox({ checked, onChange, children }) {
           </svg>
         )}
       </div>
-      <span className="text-xs text-gray-600 leading-relaxed">{children}</span>
+      <span className="text-xs text-gray-500 leading-relaxed">{children}</span>
     </label>
   );
 }
@@ -128,7 +94,7 @@ function LandingPage() {
         title: "Perhatian",
         text: "Harap centang persetujuan syarat & ketentuan terlebih dahulu.",
         icon: "warning",
-        confirmButtonColor: "#16a34a",
+        confirmButtonColor: "#7c3aed",
       });
       return;
     }
@@ -158,13 +124,13 @@ function LandingPage() {
       });
     } else {
       const message = res.data?.message || res.data?.errors?.code?.[0] || "Kode tidak valid.";
-      Swal.fire({ title: "Gagal", text: message, icon: "error", confirmButtonColor: "#16a34a" });
+      Swal.fire({ title: "Gagal", text: message, icon: "error", confirmButtonColor: "#7c3aed" });
     }
   }
 
-  /* ── Not found / Loading ─────────────────────────────────── */
+  /* ── Not found ───────────────────────────────────────────── */
   if (notFound) return (
-    <div className="min-h-screen flex items-center justify-center bg-green-50">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-purple-50">
       <div className="text-center p-8">
         <div className="text-6xl mb-4">🔍</div>
         <p className="text-2xl font-bold text-gray-600">Program Tidak Ditemukan</p>
@@ -173,16 +139,17 @@ function LandingPage() {
     </div>
   );
 
+  /* ── Loading ─────────────────────────────────────────────── */
   if (!campaign) return (
-    <div className="min-h-screen flex items-center justify-center bg-green-50">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-purple-50">
       <div className="flex flex-col items-center gap-3">
-        <div className="animate-spin rounded-full h-10 w-10 border-4 border-green-200 border-t-green-600"/>
-        <p className="text-green-700 text-sm font-medium">Memuat program...</p>
+        <div className="animate-spin rounded-full h-10 w-10 border-4 border-purple-200 border-t-violet-600"/>
+        <p className="text-violet-700 text-sm font-medium">Memuat program...</p>
       </div>
     </div>
   );
 
-  const hasDates = campaign.start_date && campaign.end_date;
+  const hasDates  = campaign.start_date && campaign.end_date;
   const hasPrizes = campaign.prize_tiers?.length > 0;
 
   /* ── Render ──────────────────────────────────────────────── */
@@ -190,34 +157,60 @@ function LandingPage() {
     <div className="min-h-screen flex flex-col lg:flex-row">
 
       {/* ════ LEFT PANEL — Form ════════════════════════════════ */}
-      <div className="relative flex-1 bg-white flex flex-col items-center justify-start overflow-hidden pt-0 pb-10 px-6">
+      <div className="relative flex-1 bg-white flex flex-col items-center justify-start overflow-hidden pt-0 pb-12 px-6">
 
-        {/* Rope line across the top */}
-        <div className="absolute top-0 left-0 right-0 h-[6px] bg-gradient-to-r from-amber-800 via-amber-600 to-amber-800 z-20"/>
+        {/* Top colorful gradient bar */}
+        <div className="absolute top-0 left-0 right-0 h-[5px] bg-gradient-to-r from-violet-500 via-pink-500 to-amber-400 z-20"/>
 
-        {/* Hanging lanterns */}
-        <div className="absolute top-0 left-0 right-0 flex justify-around z-10 pointer-events-none px-4">
-          {[90, 75, 90, 75, 90].map((h, i) => (
-            <div key={i} className="flex flex-col items-center" style={{ marginTop: -4 }}>
-              <Lantern height={h} />
-            </div>
-          ))}
-        </div>
-
-        {/* Corner ornaments */}
-        <CornerOrnament />
-        <CornerOrnamentBottomLeft />
+        {/* Floating geometric shapes */}
+        {FLOAT_SHAPES.map((s, i) => (
+          <div
+            key={i}
+            className="absolute pointer-events-none"
+            style={{
+              width: s.w,
+              height: s.h,
+              top: `${s.top}%`,
+              left: `${s.left}%`,
+              backgroundColor: s.color,
+              borderRadius: s.shape === 'circle' ? '50%' : '12px',
+            }}
+          />
+        ))}
 
         {/* Campaign header */}
-        <div className="relative z-20 text-center mt-20 mb-5 w-full max-w-sm">
-          <div className="inline-block bg-gradient-to-br from-green-600 to-green-800 rounded-2xl px-6 py-3 shadow-lg shadow-green-200 mb-3">
-            <h1 className="text-xl font-extrabold text-white tracking-wide leading-tight drop-shadow">
+        <div className="relative z-20 text-center mt-10 mb-6 w-full max-w-sm">
+
+          {/* Eyebrow label */}
+          <div className="inline-flex items-center gap-1.5 bg-violet-50 border border-violet-200 text-violet-600 text-[11px] font-bold px-3 py-1 rounded-full mb-3 tracking-wider uppercase">
+            <span>⚡</span> Event Promo Digital
+          </div>
+
+          {/* Gradient heading */}
+          <h1
+            className="text-2xl font-extrabold leading-tight mb-1"
+            style={{
+              background: 'linear-gradient(135deg, #7c3aed 0%, #a21caf 50%, #db2777 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}
+          >
+            🎁 Event Promo Berhadiah
+          </h1>
+          <p className="text-gray-500 text-sm font-medium mb-2">
+            Menangkan E-Money hingga Jutaan Rupiah!
+          </p>
+
+          {/* Campaign name badge */}
+          <div className="inline-block bg-gradient-to-r from-violet-600 to-indigo-600 rounded-xl px-5 py-2 shadow-lg shadow-violet-200 mb-2">
+            <p className="text-white font-bold text-sm tracking-wide leading-tight">
               {campaign.name}
-            </h1>
+            </p>
           </div>
 
           {hasDates && (
-            <div className="inline-flex items-center gap-1.5 bg-red-600 text-white text-[11px] font-bold px-4 py-1.5 rounded-full shadow mt-1">
+            <div className="inline-flex items-center gap-1.5 bg-rose-50 border border-rose-200 text-rose-600 text-[11px] font-bold px-4 py-1.5 rounded-full mt-2">
               <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd"/>
               </svg>
@@ -226,7 +219,7 @@ function LandingPage() {
           )}
 
           {campaign.description && (
-            <p className="text-gray-500 mt-2 text-xs leading-relaxed max-w-xs mx-auto">
+            <p className="text-gray-400 mt-2 text-xs leading-relaxed max-w-xs mx-auto">
               {campaign.description}
             </p>
           )}
@@ -238,7 +231,14 @@ function LandingPage() {
           {/* Nama */}
           <div>
             <div className={`flex items-center border-2 rounded-xl overflow-hidden transition-all
-              ${errors?.name ? 'border-red-400 bg-red-50' : 'border-green-500 bg-white focus-within:border-green-700 focus-within:shadow-sm focus-within:shadow-green-100'}`}>
+              ${errors?.name
+                ? 'border-red-400 bg-red-50'
+                : 'border-purple-200 bg-white focus-within:border-violet-500 focus-within:shadow-sm focus-within:shadow-violet-100'}`}>
+              <div className="flex items-center px-3 py-3 bg-violet-50 border-r-2 border-purple-200 flex-shrink-0">
+                <svg className="w-4 h-4 text-violet-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd"/>
+                </svg>
+              </div>
               <input
                 type="text"
                 value={form.name}
@@ -253,8 +253,10 @@ function LandingPage() {
           {/* Phone */}
           <div>
             <div className={`flex border-2 rounded-xl overflow-hidden transition-all
-              ${errors?.phone ? 'border-red-400 bg-red-50' : 'border-green-500 focus-within:border-green-700 focus-within:shadow-sm focus-within:shadow-green-100'}`}>
-              <div className="flex items-center gap-1.5 px-3 py-3 bg-green-50 border-r-2 border-green-500 flex-shrink-0">
+              ${errors?.phone
+                ? 'border-red-400 bg-red-50'
+                : 'border-purple-200 focus-within:border-violet-500 focus-within:shadow-sm focus-within:shadow-violet-100'}`}>
+              <div className="flex items-center gap-1.5 px-3 py-3 bg-violet-50 border-r-2 border-purple-200 flex-shrink-0">
                 <span className="text-base leading-none">🇮🇩</span>
                 <span className="text-sm font-semibold text-gray-700">+62</span>
               </div>
@@ -267,7 +269,7 @@ function LandingPage() {
               />
             </div>
             <p className="text-[11px] text-gray-400 mt-1 ml-1">
-              Pastikan nomor HP terhubung dengan WhatsApp dan Akun Gopay
+              Pastikan nomor HP terhubung dengan WhatsApp dan Akun e-money
             </p>
             {errors?.phone && <p className="text-red-500 text-[11px] mt-1 ml-1">{errors.phone[0]}</p>}
           </div>
@@ -275,19 +277,28 @@ function LandingPage() {
           {/* Code + submit button */}
           <div>
             <div className={`flex border-2 rounded-xl overflow-hidden transition-all
-              ${errors?.code ? 'border-red-400 bg-red-50' : 'border-green-500 focus-within:border-green-700'}`}>
+              ${errors?.code
+                ? 'border-red-400 bg-red-50'
+                : 'border-purple-200 focus-within:border-violet-500'}`}>
+              <div className="flex items-center px-3 py-3 bg-violet-50 border-r-2 border-purple-200 flex-shrink-0">
+                <svg className="w-4 h-4 text-violet-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd"/>
+                </svg>
+              </div>
               <input
                 type="text"
                 value={form.code}
                 onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })}
-                placeholder="Kode Unik"
-                className="flex-1 px-4 py-3 text-sm font-mono uppercase focus:outline-none bg-transparent placeholder-gray-400 placeholder-normal tracking-wider"
+                placeholder="Masukkan Kode Unik"
+                className="flex-1 px-4 py-3 text-sm font-mono uppercase focus:outline-none bg-transparent placeholder-gray-400 tracking-wider"
                 maxLength={14}
               />
               <button
                 type="submit"
                 disabled={isLoading}
-                className="bg-green-500 hover:bg-green-600 active:bg-green-700 text-white font-bold px-5 text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700
+                           active:from-violet-800 active:to-indigo-800 text-white font-bold px-5 text-sm
+                           transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
               >
                 {isLoading ? (
                   <span className="flex items-center gap-1">
@@ -297,15 +308,6 @@ function LandingPage() {
                     </svg>
                   </span>
                 ) : "KIRIM"}
-              </button>
-              <button
-                type="button"
-                className="bg-green-600 hover:bg-green-700 text-white px-3 flex items-center justify-center transition-colors"
-                title="Scan QR Code"
-              >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M3 3h7v7H3V3zm1 1v5h5V4H4zm1 1h3v3H5V5zm8-2h7v7h-7V3zm1 1v5h5V4h-5zm1 1h3v3h-3V5zM3 14h7v7H3v-7zm1 1v5h5v-5H4zm1 1h3v3H5v-3zm11 3h-2v-2h2v2zm-4-4h2v2h-2v-2zm2 2h2v2h-2v-2zm2 2h2v2h-2v-2zm-2 2h2v2h-2v-2zm2-2h2v2h-2v-2z"/>
-                </svg>
               </button>
             </div>
             {errors?.code && <p className="text-red-500 text-[11px] mt-1 ml-1">{errors.code[0]}</p>}
@@ -324,58 +326,65 @@ function LandingPage() {
       </div>
 
       {/* ════ RIGHT PANEL — Prize Showcase ══════════════════════ */}
-      <div className="flex-1 relative bg-gradient-to-b from-green-600 via-green-700 to-green-900
-                      flex flex-col items-center justify-center p-8 overflow-hidden min-h-72 lg:min-h-screen">
+      <div
+        className="flex-1 relative flex flex-col items-center justify-center p-8 overflow-hidden min-h-72 lg:min-h-screen"
+        style={{ background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 40%, #4338ca 100%)' }}
+      >
 
-        {/* Decorative floating circles */}
-        {CONFETTI.map((c, i) => (
+        {/* Top colorful gradient bar */}
+        <div className="absolute top-0 left-0 right-0 h-[5px] bg-gradient-to-r from-violet-500 via-pink-500 to-amber-400"/>
+
+        {/* Decorative orbs */}
+        {RIGHT_ORBS.map((o, i) => (
           <div
             key={i}
             className="absolute rounded-full pointer-events-none"
             style={{
-              width: c.w, height: c.h,
-              top: `${c.top}%`, left: `${c.left}%`,
-              backgroundColor: c.color,
+              width: o.w, height: o.h,
+              top: `${o.top}%`, left: `${o.left}%`,
+              backgroundColor: o.color,
             }}
           />
         ))}
 
-        {/* Decorative top rope for right panel */}
-        <div className="absolute top-0 left-0 right-0 h-[6px] bg-gradient-to-r from-amber-800 via-amber-600 to-amber-800"/>
-
-        {/* Hanging lanterns - right panel (smaller) */}
-        <div className="absolute top-0 left-0 right-0 flex justify-around z-10 pointer-events-none px-8 opacity-60">
-          {[60, 50, 60].map((h, i) => (
-            <div key={i} style={{ marginTop: -4 }}>
-              <Lantern height={h} />
-            </div>
-          ))}
-        </div>
+        {/* Floating money decorations */}
+        <div className="absolute top-6 left-6 text-3xl opacity-20 pointer-events-none select-none">💰</div>
+        <div className="absolute top-10 right-8 text-2xl opacity-15 pointer-events-none select-none">✨</div>
+        <div className="absolute bottom-10 left-10 text-2xl opacity-15 pointer-events-none select-none">💵</div>
+        <div className="absolute bottom-16 right-6 text-3xl opacity-20 pointer-events-none select-none">💰</div>
+        <div className="absolute top-1/3 right-3 text-xl opacity-15 pointer-events-none select-none">✨</div>
 
         {/* Content */}
-        <div className="relative z-10 text-center w-full max-w-sm mt-8">
+        <div className="relative z-10 text-center w-full max-w-sm">
 
-          <p className="text-amber-300 font-bold tracking-[0.25em] text-xs uppercase mb-1">
+          {/* Eyebrow */}
+          <div className="inline-flex items-center gap-1.5 bg-white/15 border border-white/25 text-white text-[11px] font-bold px-3 py-1 rounded-full mb-3 tracking-widest uppercase">
             ✦ GRAND PRIZE ✦
-          </p>
-          <h2 className="text-white font-extrabold text-2xl lg:text-3xl leading-tight drop-shadow-lg">
+          </div>
+
+          <h2 className="text-white font-extrabold text-2xl lg:text-3xl leading-tight drop-shadow-lg mb-1">
             Hadiah Menanti<br/>Kamu!
           </h2>
+          <p className="text-white/60 text-xs mb-4">
+            Klaim kode unikmu &amp; pilih kotak berhadiah
+          </p>
 
           {hasDates && (
-            <div className="inline-flex items-center gap-1.5 bg-amber-500 text-white text-[11px] font-bold px-4 py-1.5 rounded-full mt-3 mb-5 shadow">
+            <div className="inline-flex items-center gap-1.5 bg-amber-400/20 border border-amber-300/30 text-amber-200 text-[11px] font-bold px-4 py-1.5 rounded-full mb-5">
               PERIODE {formatDateID(campaign.start_date)} — {formatDateID(campaign.end_date)}
             </div>
           )}
 
           {/* Prize tiers */}
           {hasPrizes ? (
-            <div className="space-y-2.5 mt-4 text-left">
+            <div className="space-y-2.5 mt-2 text-left">
               {campaign.prize_tiers.map((tier, i) => (
                 <div
                   key={i}
                   className="relative flex items-center gap-3 bg-white/10 hover:bg-white/15 backdrop-blur-sm
-                             rounded-xl px-4 py-3 border border-white/10 transition-all overflow-hidden"
+                             rounded-xl px-4 py-3 border border-white/20 transition-all overflow-hidden
+                             shadow-lg shadow-black/10"
+                  style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.1)' }}
                 >
                   {/* Colored left accent */}
                   <div className={`absolute left-0 top-0 bottom-0 w-1 rounded-l-xl bg-gradient-to-b ${PRIZE_COLORS[i % PRIZE_COLORS.length]}`}/>
@@ -386,11 +395,14 @@ function LandingPage() {
                       Rp {Number(tier.amount).toLocaleString("id-ID")}
                     </p>
                   </div>
+                  {/* Subtle glow dot */}
+                  <div className="ml-auto w-2 h-2 rounded-full bg-white/30 flex-shrink-0"/>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="mt-5 bg-white/10 rounded-2xl p-6 border border-white/10">
+            <div className="mt-5 bg-white/10 rounded-2xl p-6 border border-white/20"
+                 style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.1)' }}>
               <div className="text-5xl mb-3">🎁</div>
               <p className="text-white/80 text-sm leading-relaxed">
                 Klaim kode unikmu sekarang dan menangkan hadiah spesial!
@@ -398,14 +410,14 @@ function LandingPage() {
             </div>
           )}
 
-          {/* Stars decoration */}
-          <div className="flex justify-center items-center gap-1.5 mt-6">
-            {["⭐","🌟","✨","🌟","⭐"].map((s, i) => (
-              <span key={i} className="text-base opacity-90">{s}</span>
+          {/* Bottom decoration */}
+          <div className="flex justify-center items-center gap-2 mt-6">
+            {["💰", "💵", "✨", "💵", "💰"].map((s, i) => (
+              <span key={i} className="text-lg opacity-50">{s}</span>
             ))}
           </div>
 
-          <p className="text-white/50 text-[11px] mt-4 leading-relaxed">
+          <p className="text-white/40 text-[11px] mt-4 leading-relaxed">
             Scan stiker QR pada kemasan produk<br/>untuk mendapatkan kode unik
           </p>
         </div>
