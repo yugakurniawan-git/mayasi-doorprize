@@ -137,6 +137,11 @@ class PublicVoucherController extends Controller
   {
     $campaign = VoucherCampaign::where('slug', $slug)
       ->where('is_active', true)
+      ->with(['prizeTiers' => function ($q) {
+        $q->where('is_active', true)
+          ->where('amount', '>', 0)
+          ->orderBy('amount', 'desc');
+      }])
       ->firstOrFail();
 
     return response()->json([
@@ -146,6 +151,10 @@ class PublicVoucherController extends Controller
       'description' => $campaign->description,
       'start_date'  => $campaign->start_date,
       'end_date'    => $campaign->end_date,
+      'prize_tiers' => $campaign->prizeTiers->map(fn($t) => [
+        'name'   => $t->name,
+        'amount' => $t->amount,
+      ])->values(),
     ]);
   }
 
