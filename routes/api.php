@@ -8,6 +8,10 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WinnerController;
+use App\Http\Controllers\Voucher\VoucherCampaignController;
+use App\Http\Controllers\Voucher\VoucherCodeController;
+use App\Http\Controllers\Voucher\VoucherRedemptionController;
+use App\Http\Controllers\Voucher\PublicVoucherController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('api_key')->group(function () {
@@ -60,5 +64,31 @@ Route::middleware('api_key')->group(function () {
     Route::put('/winners/{winner}', [WinnerController::class, 'update'])->middleware('can:edit winner');
     Route::get('/winners/{winner}', [WinnerController::class, 'show'])->withoutMiddleware('auth');
     Route::delete ('/winners/{winner}', [WinnerController::class, 'destroy'])->middleware('can:delete winner');
+
+    // Voucher Campaigns
+    Route::get('/voucher-campaigns', [VoucherCampaignController::class, 'index'])->middleware('can:view list voucher campaigns');
+    Route::post('/voucher-campaigns', [VoucherCampaignController::class, 'store'])->middleware('can:create voucher campaign');
+    Route::get('/voucher-campaigns/{voucherCampaign}', [VoucherCampaignController::class, 'show'])->middleware('can:view voucher campaign');
+    Route::delete('/voucher-campaigns/{voucherCampaign}', [VoucherCampaignController::class, 'destroy'])->middleware('can:delete voucher campaign');
+    Route::get('/voucher-campaigns/{voucherCampaign}/stats', [VoucherCampaignController::class, 'stats'])->middleware('can:view voucher campaign');
+    Route::post('/voucher-campaigns/{voucherCampaign}/prize-tiers', [VoucherCampaignController::class, 'storePrizeTier'])->middleware('can:manage voucher prize tiers');
+    Route::delete('/voucher-campaigns/{voucherCampaign}/prize-tiers/{prizeTier}', [VoucherCampaignController::class, 'destroyPrizeTier'])->middleware('can:manage voucher prize tiers');
+
+    // Voucher Codes
+    Route::get('/voucher-campaigns/{voucherCampaign}/codes', [VoucherCodeController::class, 'index'])->middleware('can:view list voucher campaigns');
+    Route::post('/voucher-campaigns/{voucherCampaign}/codes/generate', [VoucherCodeController::class, 'generate'])->middleware('can:generate voucher codes');
+    Route::delete('/voucher-campaigns/{voucherCampaign}/codes/{voucherCode}', [VoucherCodeController::class, 'destroy'])->middleware('can:generate voucher codes');
+
+    // Voucher Redemptions
+    Route::get('/voucher-redemptions', [VoucherRedemptionController::class, 'index'])->middleware('can:view list voucher redemptions');
+    Route::get('/voucher-redemptions/{voucherRedemption}', [VoucherRedemptionController::class, 'show'])->middleware('can:view list voucher redemptions');
+    Route::put('/voucher-redemptions', [VoucherRedemptionController::class, 'bulkUpdate'])->middleware('can:edit voucher redemption');
+    Route::put('/voucher-redemptions/{voucherRedemption}', [VoucherRedemptionController::class, 'update'])->middleware('can:edit voucher redemption');
+    Route::delete('/voucher-redemptions/{voucherRedemption}', [VoucherRedemptionController::class, 'destroy'])->middleware('can:delete voucher redemption');
   });
+
+  // Public Voucher (no auth required)
+  Route::get('/public/voucher/{slug}', [PublicVoucherController::class, 'campaign']);
+  Route::post('/public/voucher/check-code', [PublicVoucherController::class, 'checkCode']);
+  Route::post('/public/voucher/redeem', [PublicVoucherController::class, 'redeem']);
 });

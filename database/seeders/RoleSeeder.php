@@ -64,6 +64,20 @@ class RoleSeeder extends Seeder
       'view winner',
       'edit winner',
       'delete winner',
+
+      // voucher campaigns
+      'view list voucher campaigns',
+      'create voucher campaign',
+      'view voucher campaign',
+      'edit voucher campaign',
+      'delete voucher campaign',
+      'manage voucher prize tiers',
+      'generate voucher codes',
+
+      // voucher redemptions
+      'view list voucher redemptions',
+      'edit voucher redemption',
+      'delete voucher redemption',
     ]);
   }
 
@@ -98,6 +112,20 @@ class RoleSeeder extends Seeder
       'view winner',
       'edit winner',
       'delete winner',
+
+      // voucher campaigns
+      'view list voucher campaigns',
+      'create voucher campaign',
+      'view voucher campaign',
+      'edit voucher campaign',
+      'delete voucher campaign',
+      'manage voucher prize tiers',
+      'generate voucher codes',
+
+      // voucher redemptions
+      'view list voucher redemptions',
+      'edit voucher redemption',
+      'delete voucher redemption',
     ]);
   }
 }
